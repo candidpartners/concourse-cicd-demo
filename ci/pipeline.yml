@@ -1,0 +1,85 @@
+resources:
+  - name: functional-tests-source
+    type: git
+    source:
+      uri: https://github.com/candidpartners/concourse-cicd-demo.git
+      paths:
+        - functional-tests/*
+  - name: infrastructure-source
+    type: git
+    source:
+      uri: https://github.com/candidpartners/concourse-cicd-demo.git
+      paths:
+        - infrastructure/*
+  - name: lambda-source
+    type: git
+    source:
+      uri: https://github.com/candidpartners/concourse-cicd-demo.git
+      paths:
+        - serverless_lambda/*
+
+jobs:
+  - name: deploy-infrastructure
+    serial: true
+    plan:
+      - get: source
+        resource: infrastructure-source
+        trigger: true
+      - task: tf-plan
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: hashicorp/terraform
+          inputs:
+            - name: source
+          run:
+            dir: source/infrastructure
+            path: sh
+            args:
+              - -exc
+              - terraform plan -no-color -input=false
+          outputs:
+            - name: state
+              path: source/infrastructure
+  - name: build-functional-tests
+    plan:
+      - get: source
+        resource: functional-tests-source
+        trigger: true
+      - task: build
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: node
+          inputs:
+            - name: source
+          run:
+            dir: source/serverless_lambda
+            path: sh
+            args:
+              - -exc
+              - npm install
+  - name: deploy-lambda
+    plan:
+      - get: source
+        resource: lambda-source
+        trigger: true
+      - task: deploy-lambda
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: node
+          inputs:
+            - name: source
+          run:
+            dir: source/serverless_lambda
+            path: sh
+            args:
+              - -exc
+              - npm install -g serverless; serverless deploy --aws-profile deploy-role
