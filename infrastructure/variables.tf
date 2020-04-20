@@ -1,9 +1,15 @@
 variable "region" {
   type = string
-  default = "us-east-1"
 }
 
-variable "account" {
+variable "allowedAccountIds" {
+  type = list
+}
+
+variable "roleArn" {
   type = string
-  default = "619481458632"
+}
+
+variable "environment" {
+  type = string
 }

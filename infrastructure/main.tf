@@ -1,19 +1,24 @@
 provider "aws" {
   region = "${var.region}"
+  allowed_account_ids = "${var.allowedAccountIds}"
+  assume_role {
+    role_arn     = "${var.roleArn}"
+    session_name = "${var.environment}-infrastructure-deploy"
+  }
 }
 
 resource "aws_kinesis_stream" "transaction_stream" {
-  name             = "transaction-stream"
+  name             = "${var.environment}-transaction-stream"
   shard_count      = 1
   retention_period = 24
 
   tags = {
-    Environment = "dev"
+    Environment = "${var.environment}"
   }
 }
 
 resource "aws_dynamodb_table" "transaction" {
-  name           = "transaction-dynamodb-table"
+  name           = "${var.environment}-transaction-dynamodb-table"
   billing_mode   = "PROVISIONED"
   read_capacity  = 100
   write_capacity = 100
@@ -32,7 +37,7 @@ resource "aws_dynamodb_table" "transaction" {
 
   tags = {
     Name        = "transaction-table"
-    Environment = "dev"
+    Environment = "${var.environment}"
   }
 
   stream_enabled = true

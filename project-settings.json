@@ -1,0 +1,5 @@
+{
+  "region": "us-east-2",
+  "allowedAccountIds": ["005901988046"],
+  "roleArn": "arn:aws:iam::005901988046:role/fidelity-cicd-demo"
+}
