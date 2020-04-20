@@ -11,10 +11,10 @@
 #
 # Happy Coding!
 
-service: concoursedemo
+service: ${file(../settings.json):environment}
 # app and org for use with dashboard.serverless.com
 app: concoursedemo-app
-org: candid-concourse
+#org: candid-concourse
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -22,6 +22,7 @@ org: candid-concourse
 
 provider:
   name: aws
+  region: ${file(../settings.json):region}
   runtime: nodejs12.x
   iamRoleStatements:
     - Effect: "Allow"
@@ -69,7 +70,7 @@ provider:
 #    - exclude-me-dir/**
 
 functions:
-  hello:
+  concoursedemo:
     handler: handler.handler
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
@@ -82,7 +83,7 @@ functions:
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
 #      - sns: greeter-topic
-      - stream: ${file(../infrastructure/output.json):kinesis_stream:value}
+      - stream: ${file(../infrastructure/output.json):kinesis_stream.value}
 #      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
 #      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
 #      - iot:

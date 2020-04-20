@@ -8,4 +8,4 @@ default:
 	echo "No make target"
 
 deploy:
-	serverless deploy --aws-profile deploy-role
+	serverless deploy
