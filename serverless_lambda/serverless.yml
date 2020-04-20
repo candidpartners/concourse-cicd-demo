@@ -11,10 +11,10 @@
 #
 # Happy Coding!
 
-service: fidelitydemo
+service: concoursedemo
 # app and org for use with dashboard.serverless.com
-app: fidelitydemo-app
-org: candid-fidelity
+app: concoursedemo-app
+org: candid-concourse
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
