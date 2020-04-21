@@ -8,4 +8,5 @@ default:
 	echo "No make target"
 
 deploy:
+	npm install
 	serverless deploy

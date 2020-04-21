@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const uuid = require('uuid/v4')
+const { v4: uuid } = require('uuid')
 const utils = require('../utils')
 const settings = require('../../settings.json')
 
@@ -10,9 +10,7 @@ jest.setTimeout(600000)
 
 describe('Kinesis Demo', () => {
   beforeAll(async () => {
-    console.log('Starting...')
     const params = await utils.getSTSCredentials()
-    console.log(params)
 
     kinesis = new AWS.Kinesis(params)
     docClient = new AWS.DynamoDB.DocumentClient(params)
