@@ -2,7 +2,7 @@ SHELL=/bin/bash
 .EXPORT_ALL_VARIABLES:
 .ONESHELL:
 .SHELLFLAGS = -uec
-.PHONY: check_env deploy_infrastructure deploy_function test
+.PHONY: check_env plan_infrastructure deploy_infrastructure destroy_infrastructure deploy_lambda test
 
 JQ = jq
 JQ_COMBINE = jq -s '.[0] * .[1]'
@@ -34,6 +34,7 @@ destroy_infrastructure: settings.json
 
 
 deploy_lambda: settings.json
+	${JQ_COMBINE} settings.json infrastructure/output.json > serverless_lambda/config.json
 	make -C serverless_lambda deploy
 
 
