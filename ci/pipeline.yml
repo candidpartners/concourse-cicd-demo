@@ -1,85 +1,33 @@
 resources:
-  - name: functional-tests-source
+  - name: source
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      paths:
-        - functional-tests/*
-  - name: infrastructure-source
-    type: git
-    source:
-      uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      paths:
-        - infrastructure/*
-  - name: lambda-source
-    type: git
-    source:
-      uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      paths:
-        - serverless_lambda/*
-
 jobs:
-  - name: deploy-infrastructure
+  - name: deploy-static-inf
     serial: true
     plan:
       - get: source
-        resource: infrastructure-source
         trigger: true
-      - task: tf-plan
+      - task: deploy-inf
         config:
           platform: linux
           image_resource:
-            type: registry-image
+            type: docker-image
             source:
-              repository: hashicorp/terraform
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker:latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
           inputs:
             - name: source
           run:
-            dir: source/infrastructure
+            dir: source
             path: sh
             args:
               - -exc
-              - terraform plan -no-color -input=false
+              - make deploy
           outputs:
             - name: state
               path: source/infrastructure
-  - name: build-functional-tests
-    plan:
-      - get: source
-        resource: functional-tests-source
-        trigger: true
-      - task: build
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source:
-              repository: node
-          inputs:
-            - name: source
-          run:
-            dir: source/serverless_lambda
-            path: sh
-            args:
-              - -exc
-              - npm install
-  - name: deploy-lambda
-    plan:
-      - get: source
-        resource: lambda-source
-        trigger: true
-      - task: deploy-lambda
-        config:
-          platform: linux
-          image_resource:
-            type: registry-image
-            source:
-              repository: node
-          inputs:
-            - name: source
-          run:
-            dir: source/serverless_lambda
-            path: sh
-            args:
-              - -exc
-              - npm install -g serverless; serverless deploy --aws-profile deploy-role
+      -task deploy serverless lambda
+      -task run functional test
