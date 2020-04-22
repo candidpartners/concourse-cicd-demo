@@ -3,31 +3,29 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
+
 jobs:
-  - name: deploy-static-inf
+  - name: deploy
     serial: true
     plan:
       - get: source
         trigger: true
-      - task: deploy-inf
+      - task: deploy-infrastructure
+        params:
+          ENV: ((environment))
         config:
           platform: linux
           image_resource:
             type: docker-image
             source:
-              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker:latest
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           inputs:
             - name: source
           run:
             dir: source
-            path: sh
+            path: make
             args:
-              - -exc
-              - make deploy
-          outputs:
-            - name: state
-              path: source/infrastructure
-      -task deploy serverless lambda
-      -task run functional test
+              - settings.json
