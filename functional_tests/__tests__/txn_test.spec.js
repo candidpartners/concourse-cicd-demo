@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk')
 const { v4: uuid } = require('uuid')
 const utils = require('../utils')
-const settings = require('../../settings.json')
+const infrastructure = require('../../../tfoutput/output.json')
 
 let kinesis
 let docClient
@@ -25,12 +25,12 @@ describe('Kinesis Demo', () => {
     const kinesisParams = {
       Data: key,
       PartitionKey: 'partition_key' /* required */,
-      StreamName: utils.transactionStreamName(),
+      StreamName: infrastructure.kinesis_stream.value,
     }
     await kinesis.putRecord(kinesisParams).promise()
 
     const dbParams = {
-      TableName: utils.transactionTableName(),
+      TableName: infrastructure.dynamo_table.value,
       KeyConditionExpression: '#ID = :id',
       ExpressionAttributeNames: {
         '#ID': 'Id',
