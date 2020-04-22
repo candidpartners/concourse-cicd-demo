@@ -4,10 +4,12 @@ SHELL=/bin/bash
 .SHELLFLAGS = -uec
 .PHONY: deploy
 
-ENV_NAME := $(shell jq -r .environment ../settings.json)
-STATE_BUCKET := $(shell jq -r .stateBucket ../settings.json)
-TF_STATE_KEY := $(shell jq -r .tfStateKey ../settings.json)
-REGION := $(shell jq -r .region ../settings.json)
+
+SETTINGS_FILE := ../settings/settings.json
+ENV_NAME := $(shell jq -r .environment $(SETTINGS_FILE))
+STATE_BUCKET := $(shell jq -r .stateBucket $(SETTINGS_FILE))
+TF_STATE_KEY := $(shell jq -r .tfStateKey $(SETTINGS_FILE))
+REGION := $(shell jq -r .region $(SETTINGS_FILE))
 
 default:
 	echo "No make target"
@@ -25,11 +27,11 @@ init:
 	  -backend-config "region=$(REGION)"
 
 plan: init
-	terraform plan -var-file="../settings.json"
+	terraform plan -var-file="$(SETTINGS_FILE)"
 
 deploy: init
-	terraform apply -auto-approve -var-file="../settings.json"
-	terraform output -json > output.json
+	terraform apply -auto-approve -var-file="$(SETTINGS_FILE)"
+	terraform output -json > ../settings/output.json
 
 destroy: init
-	terraform destroy -var-file="../settings.json"
+	terraform destroy -var-file="$(SETTINGS_FILE)"

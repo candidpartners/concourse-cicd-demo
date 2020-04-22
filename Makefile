@@ -17,19 +17,20 @@ ifeq (,$(wildcard ./config/${ENV}.json))
 	$(error environment file ./config/${ENV}.json not found)
 endif
 
-settings.json: check_env
-	${JQ_COMBINE} project-settings.json config/$$ENV.json > settings.json
+settings: check_env
+	mkdir -p settings
+	${JQ_COMBINE} project-settings.json config/$$ENV.json > settings/settings.json
 
 default:
 	echo "No make target"
 
-plan_infrastructure: settings.json
+plan_infrastructure: settings
 	make -C infrastructure plan
 
-deploy_infrastructure: settings.json
+deploy_infrastructure: settings
 	make -C infrastructure deploy
 
-destroy_infrastructure: settings.json
+destroy_infrastructure: settings
 	make -C infrastructure destroy
 
 
