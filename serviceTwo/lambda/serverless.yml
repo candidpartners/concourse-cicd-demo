@@ -1,0 +1,36 @@
+service: serviceTwo
+
+provider:
+  name: aws
+  stage: ${file(../../../settings/settings.json):environment}
+  region: ${file(../../../settings/settings.json):region}
+  runtime: nodejs12.x
+  deploymentBucket:
+    name: ${file(../../../settings/settings.json):stateBucket}
+    maxPreviousDeploymentArtifacts: 5
+  deploymentPrefix: ${file(../../../settings/settings.json):serverlessStateKey}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "kinesis:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "logs:*"
+      Resource: "*"
+
+# Include config with lambda
+package:
+  include:
+    - config.json
+
+functions:
+  demo:
+    handler: handler.handler
+
+    events:
+      - stream: ${file(../../../tfoutput/output.json):kinesis_stream.value}
