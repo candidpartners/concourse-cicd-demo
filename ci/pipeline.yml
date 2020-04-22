@@ -3,7 +3,7 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      branch: greg
+      branch: reorg
 
 jobs:
   - name: serviceOne
@@ -54,7 +54,7 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source/infrastructure
+            dir: source/serviceOne/infrastructure
             path: sh
             args:
               - deploy_infrastructure.sh
@@ -78,7 +78,7 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source/lambda
+            dir: source/serviceOne/lambda
             path: sh
             args:
               - deploy_lambda.sh
@@ -102,7 +102,109 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source/functional_tests
+            dir: source/serviceOne/functional_tests
+            path: sh
+            args:
+              - -exc
+              - npm install; npm test
+
+  - name: serviceTwo
+    serial: true
+    plan:
+      - get: source
+        trigger: true
+
+      - task: settings
+        params:
+          ENV: ((environment))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+          outputs:
+            - name: settings
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            path: sh
+            args:
+              - -exc
+              - jq -s '.[0] * .[1]' ./source/project-settings.json ./source/config/$ENV.json > ./settings/settings.json
+
+      - task: deploy-infrastructure
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          outputs:
+            - name: tfoutput
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/serviceTwo/infrastructure
+            path: sh
+            args:
+              - deploy_infrastructure.sh
+
+      - task: deploy-lambda
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+            - name: tfoutput
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/serviceTwo/lambda
+            path: sh
+            args:
+              - deploy_lambda.sh
+
+      - task: functional-tests
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+            - name: tfoutput
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/serviceTwo/functional_tests
             path: sh
             args:
               - -exc

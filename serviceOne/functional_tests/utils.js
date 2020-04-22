@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk')
 const sts = new AWS.STS()
-const settings = require('../../settings/settings.json')
+const settings = require('../../../settings/settings.json')
 
 function sleep(ms) {
   return new Promise((resolve) => {
