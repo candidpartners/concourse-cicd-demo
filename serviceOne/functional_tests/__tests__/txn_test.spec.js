@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const { v4: uuid } = require('uuid')
 const Path = require('path')
 const utils = require('../utils')
-const infrastructure = require('../../../tfoutput/output.json')
+const infrastructure = require('../../../../tfoutput/output.json')
 
 let kinesis
 let docClient

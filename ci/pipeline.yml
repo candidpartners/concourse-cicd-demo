@@ -3,7 +3,7 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      branch: greg
+      branch: reorg
 
 jobs:
   - name: serviceOne
@@ -54,7 +54,7 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source/infrastructure
+            dir: source/serviceOne/infrastructure
             path: sh
             args:
               - deploy_infrastructure.sh
@@ -78,7 +78,7 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source/lambda
+            dir: source/serviceOne/lambda
             path: sh
             args:
               - deploy_lambda.sh
@@ -102,7 +102,7 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source/functional_tests
+            dir: source/serviceOne/functional_tests
             path: sh
             args:
               - -exc

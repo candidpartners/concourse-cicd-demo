@@ -14,7 +14,7 @@ terraform {
 }
 
 resource "aws_kinesis_stream" "transaction_stream" {
-  name             = "${var.environment}-transaction-stream"
+  name             = "${var.environment}-serviceOne-transaction-stream"
   shard_count      = 1
   retention_period = 24
 
@@ -24,7 +24,7 @@ resource "aws_kinesis_stream" "transaction_stream" {
 }
 
 resource "aws_dynamodb_table" "transaction" {
-  name           = "${var.environment}-transaction-dynamodb-table"
+  name           = "${var.environment}-serviceOne-transaction-dynamodb-table"
   billing_mode   = "PROVISIONED"
   read_capacity  = 100
   write_capacity = 100

@@ -19,4 +19,4 @@ Simple functional test.
     aws_secret_access_key: (secret key)
     ```
 6. Set up pipeline: `fly -t demo set-pipeline -c pipeline.yml -p demo-pipeline -l params.yml`
-7. Trigger job from command line `fly -t demo trigger-job -j demo-pipeline/deploy -w`
+7. Trigger job from command line `fly -t demo trigger-job -j demo-pipeline/serviceOne -w`

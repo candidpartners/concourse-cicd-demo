@@ -2,13 +2,13 @@ service: serviceOne
 
 provider:
   name: aws
-  stage: ${file(../../settings/settings.json):environment}
-  region: ${file(../../settings/settings.json):region}
+  stage: ${file(../../../settings/settings.json):environment}
+  region: ${file(../../../settings/settings.json):region}
   runtime: nodejs12.x
   deploymentBucket:
-    name: ${file(../../settings/settings.json):stateBucket}
+    name: ${file(../../../settings/settings.json):stateBucket}
     maxPreviousDeploymentArtifacts: 5
-  deploymentPrefix: ${file(../../settings/settings.json):serverlessStateKey}
+  deploymentPrefix: ${file(../../../settings/settings.json):serverlessStateKey}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -33,4 +33,4 @@ functions:
     handler: handler.handler
 
     events:
-      - stream: ${file(../../tfoutput/output.json):kinesis_stream.value}
+      - stream: ${file(../../../tfoutput/output.json):kinesis_stream.value}

@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # Directories created for passing input/output between tasks
-SETTINGS=../../settings
-TFOUTPUT=../../tfoutput
+SETTINGS=../../../settings
+TFOUTPUT=../../../tfoutput
 
 ENV_NAME=`jq -r .environment $SETTINGS/settings.json`
 STATE_BUCKET=`jq -r .stateBucket $SETTINGS/settings.json`
