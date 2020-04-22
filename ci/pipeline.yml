@@ -81,4 +81,4 @@ jobs:
             dir: source/lambda
             path: sh
             args:
-              - deploy_infrastructure.sh
+              - deploy_lambda.sh
