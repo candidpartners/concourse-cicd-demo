@@ -1,5 +1,6 @@
 const AWS = require('aws-sdk')
 const { v4: uuid } = require('uuid')
+const Path = require('path')
 const utils = require('../utils')
 const infrastructure = require('../../../tfoutput/output.json')
 
@@ -22,10 +23,11 @@ describe('Kinesis Demo', () => {
 
   it('Can write an item to the dynamo table', async function () {
     const key = uuid()
+    const streamName = Path.basename(infrastructure.kinesis_stream.value)
     const kinesisParams = {
       Data: key,
       PartitionKey: 'partition_key' /* required */,
-      StreamName: infrastructure.kinesis_stream.value,
+      StreamName: streamName,
     }
     await kinesis.putRecord(kinesisParams).promise()
 
