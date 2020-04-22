@@ -29,7 +29,6 @@ describe('Kinesis Demo', () => {
       PartitionKey: 'partition_key' /* required */,
       StreamName: streamName,
     }
-    console.log(kinesisParams)
     await kinesis.putRecord(kinesisParams).promise()
 
     const dbParams = {
@@ -42,8 +41,7 @@ describe('Kinesis Demo', () => {
         ':id': key,
       },
     }
-    console.log(dbParams)
-    await utils.sleep(8000)
+    await utils.sleep(30000)
     const res = await docClient.query(dbParams).promise()
 
     expect(res.Items[0].Id).toEqual(key)
