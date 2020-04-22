@@ -41,9 +41,17 @@ describe('Kinesis Demo', () => {
         ':id': key,
       },
     }
-    await utils.sleep(30000)
-    const res = await docClient.query(dbParams).promise()
 
-    expect(res.Items[0].Id).toEqual(key)
+    for (var i = 0; i < 6; i++) {
+      await utils.sleep(5000)
+      const res = await docClient.query(dbParams).promise()
+
+      if (res) {
+        expect(res.Items[0].Id).toEqual(key)
+        return
+      }
+    }
+
+    throw new Error('Record did not appear in DynamoDB after 30 sec')
   })
 })
