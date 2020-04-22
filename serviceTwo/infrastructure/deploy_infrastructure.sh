@@ -11,7 +11,7 @@ REGION=`jq -r .region $SETTINGS/settings.json`
 
 terraform init \
           -backend-config "bucket=${STATE_BUCKET}" \
-          -backend-config "key=${TF_STATE_KEY}/${ENV_NAME}.tfstate" \
+          -backend-config "key=${TF_STATE_KEY}/serviceTwo/${ENV_NAME}.tfstate" \
           -backend-config "region=${REGION}"
 
 terraform apply -auto-approve -var-file="$SETTINGS/settings.json"
