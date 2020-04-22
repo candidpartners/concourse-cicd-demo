@@ -6,7 +6,7 @@ resources:
       branch: greg
 
 jobs:
-  - name: deploy
+  - name: serviceOne
     serial: true
     plan:
       - get: source
@@ -34,7 +34,6 @@ jobs:
               - -exc
               - jq -s '.[0] * .[1]' ./source/project-settings.json ./source/config/$ENV.json > ./settings/settings.json
 
-
       - task: deploy-infrastructure
         params:
           ENV: ((environment))
@@ -56,6 +55,30 @@ jobs:
               aws_secret_access_key: ((aws_secret_access_key))
           run:
             dir: source/infrastructure
+            path: sh
+            args:
+              - deploy_infrastructure.sh
+
+      - task: deploy-lambda
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+            - name: tfoutput
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/lambda
             path: sh
             args:
               - deploy_infrastructure.sh
