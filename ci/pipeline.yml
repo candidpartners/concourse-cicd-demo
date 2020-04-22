@@ -10,9 +10,12 @@ jobs:
     plan:
       - get: source
         trigger: true
+
       - task: deploy-infrastructure
         params:
           ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
         config:
           platform: linux
           image_resource:
@@ -28,4 +31,4 @@ jobs:
             dir: source
             path: make
             args:
-              - settings.json
+              - deploy_infrastructure
