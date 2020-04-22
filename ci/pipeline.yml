@@ -3,9 +3,10 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
+      branch: greg
 
 jobs:
-  - name: deploy
+  - name: serviceOne
     serial: true
     plan:
       - get: source
@@ -28,10 +29,10 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source
-            path: make
+            path: sh
             args:
-              - settings
+              - -exc
+              - jq -s '.[0] * .[1]' ./source/project-settings.json ./source/config/$ENV.json > ./settings/settings.json
 
       - task: deploy-infrastructure
         params:
@@ -44,7 +45,7 @@ jobs:
             - name: source
             - name: settings
           outputs:
-            - name: settings
+            - name: tfoutput
           image_resource:
             type: docker-image
             source:
@@ -53,10 +54,10 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source
-            path: make
+            dir: source/infrastructure
+            path: sh
             args:
-              - deploy_infrastructure
+              - deploy_infrastructure.sh
 
       - task: deploy-lambda
         params:
@@ -68,8 +69,7 @@ jobs:
           inputs:
             - name: source
             - name: settings
-          outputs:
-            - name: settings
+            - name: tfoutput
           image_resource:
             type: docker-image
             source:
@@ -78,7 +78,32 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source
-            path: make
+            dir: source/lambda
+            path: sh
             args:
-              - deploy_lambda
+              - deploy_lambda.sh
+
+      - task: functional-tests
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+            - name: tfoutput
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/functional_tests
+            path: sh
+            args:
+              - -exc
+              - npm install; npm test

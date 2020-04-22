@@ -1,9 +1,6 @@
 const AWS = require('aws-sdk')
 const sts = new AWS.STS()
-const settings = require('../settings.json')
-
-const TRANSACTION_STREAM = 'transaction-stream'
-const TRANSACTION_TABLE = 'transaction-dynamodb-table'
+const settings = require('../../settings/settings.json')
 
 function sleep(ms) {
   return new Promise((resolve) => {
@@ -27,18 +24,7 @@ async function getSTSCredentials() {
   }
 }
 
-function transactionStreamName() {
-  return `${settings.environment}-${TRANSACTION_STREAM}`
-}
-
-function transactionTableName() {
-  return `${settings.environment}-${TRANSACTION_TABLE}`
-}
-
 module.exports = {
   sleep,
   getSTSCredentials,
-
-  transactionStreamName,
-  transactionTableName,
 }
