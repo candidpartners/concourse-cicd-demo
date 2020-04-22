@@ -29,8 +29,11 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source
-            path: mk_settings.sh
+            path: sh
+            args:
+              - -exc
+              - jq -s '.[0] * .[1]' ./source/project-settings.json ./source/config/$ENV.json > ./settings/settings.json
+
 
       - task: deploy-infrastructure
         params:
@@ -43,7 +46,7 @@ jobs:
             - name: source
             - name: settings
           outputs:
-            - name: settings
+            - name: tfoutput
           image_resource:
             type: docker-image
             source:
@@ -52,8 +55,7 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            dir: source
+            dir: source/infrastructure
             path: sh
             args:
-              - -exc
-              - cat settings/settings.json
+              - deploy_infrastructure.sh
