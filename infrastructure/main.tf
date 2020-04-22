@@ -7,6 +7,12 @@ provider "aws" {
   }
 }
 
+# Save state to S3.  These parameters are populated by -backend-config
+# args to terraform init in the Makefile
+terraform {
+  backend "s3" {}
+}
+
 resource "aws_kinesis_stream" "transaction_stream" {
   name             = "${var.environment}-transaction-stream"
   shard_count      = 1
