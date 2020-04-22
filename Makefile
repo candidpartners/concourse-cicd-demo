@@ -33,11 +33,8 @@ deploy_infrastructure: settings
 destroy_infrastructure: settings
 	make -C infrastructure destroy
 
-
-deploy_lambda: settings.json
-	${JQ_COMBINE} settings.json infrastructure/output.json > serverless_lambda/config.json
+deploy_lambda: settings
 	make -C serverless_lambda deploy
 
-
-test: settings.json
+test: settings
 	make -C functional_tests test

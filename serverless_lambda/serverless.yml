@@ -1,10 +1,14 @@
-service: ${file(../settings.json):environment}
-app: concoursedemo-app
+service: serviceOne
 
 provider:
   name: aws
-  region: ${file(../settings.json):region}
+  stage: ${file(../settings/settings.json):environment}
+  region: ${file(../settings/settings.json):region}
   runtime: nodejs12.x
+  deploymentBucket:
+    name: ${file(../settings/settings.json):stateBucket}
+    maxPreviousDeploymentArtifacts: 5
+  deploymentPrefix: ${file(../settings/settings.json):serverlessStateKey}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -22,11 +26,11 @@ provider:
 # Include config with lambda
 package:
   include:
-    - infrastructure.json
+    - config.json
 
 functions:
-  concoursedemo:
+  demo:
     handler: handler.handler
 
     events:
-      - stream: ${file(../infrastructure/output.json):kinesis_stream.value}
+      - stream: ${file(../settings/output.json):kinesis_stream.value}
