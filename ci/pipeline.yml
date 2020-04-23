@@ -3,7 +3,7 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      branch: reorg
+      branch: master
 
 jobs:
   - name: serviceOne
