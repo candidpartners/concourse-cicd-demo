@@ -42,7 +42,7 @@ describe('Kinesis Demo', () => {
       },
     }
 
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 16; i++) {
       await utils.sleep(5000)
       const res = await docClient.query(dbParams).promise()
 
