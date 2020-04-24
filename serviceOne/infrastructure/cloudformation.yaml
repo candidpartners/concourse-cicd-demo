@@ -1,0 +1,49 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Cloudformation equivalent of Terraform resources.
+
+Parameters:
+  environment:
+    Type: String
+
+Resources:
+  KinesisStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: !Join [ -, [ !Ref environment, serviceOne, transaction, stream ] ]
+      RetentionPeriodHours: 24
+      ShardCount: 1
+
+      Tags:
+        - Key: Environment
+          Value: !Ref environment
+
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Join [ -, [ !Ref environment, serviceOne, transaction, dynamodb, table ] ]
+      BillingMode: "PROVISIONED"
+      AttributeDefinitions:
+        - AttributeName: "Id"
+          AttributeType: "S"
+        - AttributeName: "Sort"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "Id"
+          KeyType: "HASH"
+        - AttributeName: "Sort"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 100
+        WriteCapacityUnits: 100
+      StreamSpecification:
+        StreamViewType: "KEYS_ONLY"
+      Tags:
+        - Key: transaction-table
+          Value: !Ref environment
+Outputs:
+  DynamoDBTableStreamArn:
+    Value: !GetAtt DynamoDBTable.StreamArn
+  KinesisStream:
+    Value: !GetAtt KinesisStream.Arn

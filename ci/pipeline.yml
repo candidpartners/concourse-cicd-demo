@@ -3,7 +3,7 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      branch: master
+      branch: cloudformation
 
 jobs:
   - name: serviceOne
