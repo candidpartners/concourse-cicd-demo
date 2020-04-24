@@ -11,7 +11,7 @@ Resources:
   KinesisStream:
     Type: AWS::Kinesis::Stream
     Properties:
-      Name: !Join [ -, [ !Ref environment, serviceOne, transaction, stream ] ]
+      Name: !Join [ -, [ !Ref environment, serviceTwo, transaction, stream ] ]
       RetentionPeriodHours: 24
       ShardCount: 1
 
@@ -22,7 +22,7 @@ Resources:
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Join [ -, [ !Ref environment, serviceOne, transaction, dynamodb, table ] ]
+      TableName: !Join [ -, [ !Ref environment, serviceTwo, transaction, dynamodb, table ] ]
       BillingMode: "PROVISIONED"
       AttributeDefinitions:
         - AttributeName: "Id"
