@@ -33,4 +33,4 @@ functions:
     handler: handler.handler
 
     events:
-      - stream: ${file(../../../tfoutput/output.json):kinesis_stream.value}
+      - stream: ${file(../../../tfoutput/output.json):kinesis_stream}

@@ -18,7 +18,7 @@ async function handler(event) {
 
       const Key = { Id: payload, Sort: `${Date.now()}`, data: payload }
       const params = {
-        TableName: config.dynamo_table.value,
+        TableName: config.dynamo_table,
         Key,
         Item: Key,
       }
