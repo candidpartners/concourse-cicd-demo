@@ -46,7 +46,7 @@ describe('Kinesis Demo', () => {
       await utils.sleep(5000)
       const res = await docClient.query(dbParams).promise()
 
-      if (res) {
+      if (res.Items) {
         expect(res.Items[0].Id).toEqual(key)
         return
       }
