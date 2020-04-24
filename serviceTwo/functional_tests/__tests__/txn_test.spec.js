@@ -42,11 +42,11 @@ describe('Kinesis Demo', () => {
       },
     }
 
-    for (var i = 0; i < 16; i++) {
-      await utils.sleep(10000)
+    for (var i = 0; i < 10; i++) {
+      await utils.sleep(5000)
       const res = await docClient.query(dbParams).promise()
 
-      if (res.Items) {
+      if (res.Items.length > 0) {
         expect(res.Items[0].Id).toEqual(key)
         return
       }
