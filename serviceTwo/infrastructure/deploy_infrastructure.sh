@@ -21,7 +21,7 @@ aws cloudformation create-stack \
 
 sleep 60
 
-DYNARN=$(aws cloudformation describe-stacks --region $REGION --stack-name $SERVICE | jq -r '.Stacks[0].Outputs[0].OutputValue')
-KINARN=$(aws cloudformation describe-stacks --region $REGION --stack-name $SERVICE | jq -r '.Stacks[0].Outputs[1].OutputValue')
+DYNARN=$(aws cloudformation describe-stacks --region $REGION --stack-name $ENV_NAME-$SERVICE | jq -r '.Stacks[0].Outputs[0].OutputValue')
+KINARN=$(aws cloudformation describe-stacks --region $REGION --stack-name $ENV_NAME-$SERVICE | jq -r '.Stacks[0].Outputs[1].OutputValue')
 
 jq -n --arg dyn "$DYNARN" --arg kin "$KINARN" '{"dynamo_table":$dyn, "kinesis_stream":$kin}' > $TFOUTPUT/output.json
