@@ -23,7 +23,7 @@ describe('Kinesis Demo', () => {
 
   it('Can write an item to the dynamo table', async function () {
     const key = uuid()
-    const streamName = Path.basename(infrastructure.kinesis_stream.value)
+    const streamName = Path.basename(infrastructure.kinesis_stream)
     const kinesisParams = {
       Data: key,
       PartitionKey: 'partition_key' /* required */,
@@ -32,7 +32,7 @@ describe('Kinesis Demo', () => {
     await kinesis.putRecord(kinesisParams).promise()
 
     const dbParams = {
-      TableName: infrastructure.dynamo_table.value,
+      TableName: infrastructure.dynamo_table,
       KeyConditionExpression: '#ID = :id',
       ExpressionAttributeNames: {
         '#ID': 'Id',
