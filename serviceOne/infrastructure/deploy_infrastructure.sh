@@ -16,7 +16,7 @@ aws cloudformation create-stack \
 --region us-east-2 \
 --stack-name $ENV_NAME-$SERVICE \
 --template-body file://cloudformation.yaml \
---role-arn $ROLE_ARN\
+--role-arn $ROLE_ARN \
 --parameters ParameterKey=environment,ParameterValue=$ENV_NAME
 
 sleep 30
