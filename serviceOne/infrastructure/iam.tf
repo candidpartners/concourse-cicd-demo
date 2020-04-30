@@ -54,13 +54,15 @@ resource "aws_iam_policy" "lambda_kinesis_dynamo"{
       "Action": [
         "kinesis:*"
       ],
-      "Effect": "Allow"
+      "Effect": "Allow",
+      "Resource": "*"
     },
     {
       "Action": [
         "dynamodb:PutItem"
       ],
-      "Effect": "Allow"
+      "Effect": "Allow",
+      "Resource": "*"
     }
   ]
 }
