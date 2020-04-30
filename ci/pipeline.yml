@@ -57,6 +57,7 @@ jobs:
             dir: source/serviceOne/infrastructure
             path: sh
             args:
+              - -e
               - deploy_infrastructure.sh
 
       # - task: deploy-lambda
