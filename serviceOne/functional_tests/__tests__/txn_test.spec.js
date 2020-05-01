@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const { v4: uuid } = require('uuid')
 const Path = require('path')
 const utils = require('../utils')
-const infrastructure = require('../../../../tfoutput/output.json')
+const { infrastructure } = require('../settings.js')
 
 let kinesis
 let docClient
@@ -46,7 +46,7 @@ describe('Kinesis Demo', () => {
       await utils.sleep(5000)
       const res = await docClient.query(dbParams).promise()
 
-      if (res) {
+      if (res.Items.length) {
         expect(res.Items[0].Id).toEqual(key)
         return
       }
