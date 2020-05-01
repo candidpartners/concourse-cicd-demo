@@ -1,4 +1,4 @@
 module.exports = {
-  settings: require('../../../settings.json'),
-  infrastructure: require('../../../infrastructure.json'),
+  settings: require('../../../settings/settings.json'),
+  infrastructure: require('../../../settings/infrastructure.json'),
 }
