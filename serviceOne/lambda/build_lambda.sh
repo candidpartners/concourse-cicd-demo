@@ -8,9 +8,6 @@ BUILD=$WORKSPACE/build         # output
 # Install dependencies
 npm install
 
-# Run unit tests
-# TBD
-
 # Bundle source and dependencies
 npx webpack
 
