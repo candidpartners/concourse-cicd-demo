@@ -19,4 +19,4 @@ terraform init \
           -backend-config "region=${REGION}"
 
 terraform apply -auto-approve -var-file="$SETTINGS/settings.json"
-terraform output -json > $TFOUTPUT/output.json
+terraform output -json > $SETTINGS/output.json
