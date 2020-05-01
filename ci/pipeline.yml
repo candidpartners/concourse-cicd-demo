@@ -32,7 +32,7 @@ jobs:
             path: sh
             dir: source
             args:
-              - -ec
+              - -exc
               - jq -s '.[0] * .[1]' project-settings.json config/$ENV.json > ../settings/settings.json
 
       - task: deploy-infrastructure
@@ -87,6 +87,29 @@ jobs:
               - -e
               - build_lambda.sh
 
+      - task: test-lambda
+        params:
+          ENV: ((environment))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          outputs:
+            - name: source
+            - name: build
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/serviceOne/lambda
+            path: npm
+            args:
+              - test
 
       # - task: deploy-lambda
       #   params:
