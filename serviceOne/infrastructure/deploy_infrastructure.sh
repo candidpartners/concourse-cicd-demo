@@ -1,8 +1,10 @@
 #!/bin/sh
 
-# Directories created by concourse for passing input/output between tasks
-SETTINGS=settings   # input
-TFOUTPUT=tfoutput   # output
+# Directories created by concourse for passing input/output between
+# tasks
+WORKSPACE=../../..  # Top level where source and input/output are mounted
+SETTINGS=$WORKSPACE/settings   # input
+TFOUTPUT=$WORKSPACE/tfoutput   # output
 
 ENV_NAME=`jq -r .environment $SETTINGS/settings.json`
 STATE_BUCKET=`jq -r .stateBucket $SETTINGS/settings.json`

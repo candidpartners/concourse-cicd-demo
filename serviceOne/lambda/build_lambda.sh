@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Directories created by concourse for passing input/output between tasks
-SETTINGS=settings  # input
-TFOUTPUT=tfoutput  # input
-BUILD=build        # output
+WORKSPACE=../../..  # Top level where source, input and output are mounted
+SETTINGS=$WORKSPACE/settings   # input
+TFOUTPUT=$WORKSPACE/tfoutput   # input
+BUILD=$WORKSPACE/build         # output
 
 # Install dependencies
 npm install
