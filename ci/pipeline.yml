@@ -95,9 +95,6 @@ jobs:
           inputs:
             - name: source
             - name: settings
-          outputs:
-            - name: source
-            - name: build
           image_resource:
             type: docker-image
             source:
@@ -124,34 +121,46 @@ jobs:
           image_resource:
             type: docker-image
             source:
-              repository: amazon/aws-cli
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
               tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
           run:
             path: sh
             args:
-              - deploy_lambda.sh
+              - -exc
+              - |
+                FUNCTION_NAME=`jq -r .lambda_function.value settings/output.json`
+                REGION=`jq -r .region settings/settings.json`
+                ZIPFILE=`basename build/*.zip`
+                export AWS_PAGER=""
 
-      # - task: functional-tests
-      #   params:
-      #     ENV: ((environment))
-      #     AWS_ACCESS_KEY_ID: ((aws_access_key_id))
-      #     AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
-      #   config:
-      #     platform: linux
-      #     inputs:
-      #       - name: source
-      #       - name: settings
-      #       - name: tfoutput
-      #     image_resource:
-      #       type: docker-image
-      #       source:
-      #         repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
-      #         tag: latest
-      #         aws_access_key_id: ((aws_access_key_id))
-      #         aws_secret_access_key: ((aws_secret_access_key))
-      #     run:
-      #       dir: source/serviceOne/functional_tests
-      #       path: sh
-      #       args:
-      #         - -exc
-      #         - npm install; npm test
+                aws lambda update-function-code --region $REGION --function-name $FUNCTION_NAME --zip-file fileb://build/$ZIPFILE
+
+
+      - task: functional-tests
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+            - name: tfoutput
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/serviceOne/functional_tests
+            path: sh
+            args:
+              - -exc
+              - |
+                npm install
+                npm test
