@@ -32,7 +32,7 @@ jobs:
             path: sh
             dir: source
             args:
-              - -exc
+              - -ec
               - jq -s '.[0] * .[1]' project-settings.json config/$ENV.json > ../settings/settings.json
 
       - task: deploy-infrastructure
@@ -46,7 +46,7 @@ jobs:
             - name: source
             - name: settings
           outputs:
-            - name: tfoutput
+            - name: settings
           image_resource:
             type: docker-image
             source:
@@ -70,8 +70,8 @@ jobs:
           inputs:
             - name: source
             - name: settings
-            - name: tfoutput
           outputs:
+            - name: source
             - name: build
           image_resource:
             type: docker-image
