@@ -2,7 +2,7 @@ resource "aws_lambda_function" "serviceOne" {
   function_name = "${var.environment}-serviceOne"
   filename      = "blank.zip"
   role          = "${aws_iam_role.iam_for_lambda.arn}"
-  handler       = "exports.handler"
+  handler       = "index.handler"
   runtime       = "nodejs12.x"
 }
 
