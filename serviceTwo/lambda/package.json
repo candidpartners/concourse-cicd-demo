@@ -1,10 +1,10 @@
 {
-  "name": "concoursedemo",
+  "name": "serviceTwo",
   "version": "1.0.0",
   "description": "",
-  "main": "handler.js",
+  "main": "./src/handler.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -12,5 +12,11 @@
     "aws-sdk": "^2.658.0",
     "aws-xray-sdk": "^2.5.0",
     "uuid": "^7.0.3"
+  },
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "jest": "^25.5.3",
+    "jest-cli": "^25.5.3"
   }
 }
