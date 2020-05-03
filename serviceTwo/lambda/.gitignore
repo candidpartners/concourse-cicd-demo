@@ -1,8 +1,4 @@
 # package directories
 node_modules
-jspm_packages
 package-lock.json
-config.json
-
-# Serverless directories
-.serverless
+dist/

@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const { v4: uuid } = require('uuid')
 const Path = require('path')
 const utils = require('../utils')
-const infrastructure = require('../../../../tfoutput/output.json')
+const { infrastructure } = require('../settings.js')
 
 let kinesis
 let docClient
@@ -42,16 +42,16 @@ describe('Kinesis Demo', () => {
       },
     }
 
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 10; i++) {
       await utils.sleep(5000)
       const res = await docClient.query(dbParams).promise()
 
-      if (res) {
+      if (res.Items.length > 0) {
         expect(res.Items[0].Id).toEqual(key)
         return
       }
     }
 
-    throw new Error('Record did not appear in DynamoDB after 30 sec')
+    throw new Error('Record did not appear in DynamoDB.')
   })
 })

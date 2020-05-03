@@ -3,7 +3,7 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      branch: master
+      branch: noserverless
 
 jobs:
   - name: serviceOne
@@ -30,9 +30,10 @@ jobs:
               aws_secret_access_key: ((aws_secret_access_key))
           run:
             path: sh
+            dir: source
             args:
               - -exc
-              - jq -s '.[0] * .[1]' ./source/project-settings.json ./source/config/$ENV.json > ./settings/settings.json
+              - jq -s '.[0] * .[1]' project-settings.json config/$ENV.json > ../settings/settings.json
 
       - task: deploy-infrastructure
         params:
@@ -45,7 +46,7 @@ jobs:
             - name: source
             - name: settings
           outputs:
-            - name: tfoutput
+            - name: settings
           image_resource:
             type: docker-image
             source:
@@ -57,19 +58,41 @@ jobs:
             dir: source/serviceOne/infrastructure
             path: sh
             args:
-              - deploy_infrastructure.sh
+              - -ec
+              - |
+                # Top level where source and input/output are mounted
+                WORKSPACE=../../..
+                SETTINGS=$WORKSPACE/settings
 
-      - task: deploy-lambda
+                SETTINGS_FILE=$SETTINGS/settings.json
+                TFOUTPUT_FILE=$SETTINGS/infrastructure.json
+
+                ENV_NAME=`jq -r .environment $SETTINGS_FILE`
+                STATE_BUCKET=`jq -r .stateBucket $SETTINGS_FILE`
+                TF_STATE_KEY=`jq -r .tfStateKey $SETTINGS_FILE`
+                REGION=`jq -r .region $SETTINGS_FILE`
+
+                terraform init \
+                  -backend-config "bucket=${STATE_BUCKET}" \
+                  -backend-config "key=${TF_STATE_KEY}/serviceOne/${ENV_NAME}.tfstate" \
+                  -backend-config "region=${REGION}"
+
+                terraform apply -auto-approve -var-file="$SETTINGS/settings.json"
+                terraform output -json > $SETTINGS/infrastructure.json
+
+
+      # Install dependencies, run unit tests, create webpack bundle, build
+      - task: build-lambda
         params:
           ENV: ((environment))
-          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
-          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
         config:
           platform: linux
           inputs:
             - name: source
             - name: settings
-            - name: tfoutput
+          outputs:
+            - name: source
+            - name: build
           image_resource:
             type: docker-image
             source:
@@ -81,7 +104,79 @@ jobs:
             dir: source/serviceOne/lambda
             path: sh
             args:
-              - deploy_lambda.sh
+              - -ec
+              - |
+                # Directories created by concourse for passing input/output between tasks
+                WORKSPACE=../../..
+                SETTINGS=$WORKSPACE/settings
+                BUILD=$WORKSPACE/build
+
+                # Install dependencies
+                npm install
+
+                # Bundle source and dependencies
+                npx webpack
+
+                # Build config file for lambda
+                jq -s '.[0] * .[1]' $SETTINGS/settings.json $SETTINGS/infrastructure.json > ./dist/config.json
+
+                # hash the code to use as zip bundle filename
+                hash=($(md5sum dist/index.js))
+
+                # Build zip bundle for uploading to lambda
+                zip -jr $BUILD/${hash}.zip dist
+
+
+      - task: test-lambda
+        params:
+          ENV: ((environment))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/serviceOne/lambda
+            path: npm
+            args:
+              - test
+
+      - task: deploy-lambda
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: settings
+            - name: build
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                FUNCTION_NAME=`jq -r .lambda_function.value settings/infrastructure.json`
+                REGION=`jq -r .region settings/settings.json`
+                ZIPFILE=`basename build/*.zip`
+                export AWS_PAGER=""
+
+                aws lambda update-function-code --region $REGION --function-name $FUNCTION_NAME --zip-file fileb://build/$ZIPFILE
+
 
       - task: functional-tests
         params:
@@ -93,7 +188,6 @@ jobs:
           inputs:
             - name: source
             - name: settings
-            - name: tfoutput
           image_resource:
             type: docker-image
             source:
@@ -106,7 +200,9 @@ jobs:
             path: sh
             args:
               - -exc
-              - npm install; npm test
+              - |
+                npm install
+                npm test
 
   - name: serviceTwo
     serial: true
@@ -132,9 +228,10 @@ jobs:
               aws_secret_access_key: ((aws_secret_access_key))
           run:
             path: sh
+            dir: source
             args:
               - -exc
-              - jq -s '.[0] * .[1]' ./source/project-settings.json ./source/config/$ENV.json > ./settings/settings.json
+              - jq -s '.[0] * .[1]' project-settings.json config/$ENV.json > ../settings/settings.json
 
       - task: deploy-infrastructure
         params:
@@ -147,7 +244,7 @@ jobs:
             - name: source
             - name: settings
           outputs:
-            - name: tfoutput
+            - name: settings
           image_resource:
             type: docker-image
             source:
@@ -159,19 +256,41 @@ jobs:
             dir: source/serviceTwo/infrastructure
             path: sh
             args:
-              - deploy_infrastructure.sh
+              - -ec
+              - |
+                # Top level where source and input/output are mounted
+                WORKSPACE=../../..
+                SETTINGS=$WORKSPACE/settings
 
-      - task: deploy-lambda
+                SETTINGS_FILE=$SETTINGS/settings.json
+                TFOUTPUT_FILE=$SETTINGS/infrastructure.json
+
+                ENV_NAME=`jq -r .environment $SETTINGS_FILE`
+                STATE_BUCKET=`jq -r .stateBucket $SETTINGS_FILE`
+                TF_STATE_KEY=`jq -r .tfStateKey $SETTINGS_FILE`
+                REGION=`jq -r .region $SETTINGS_FILE`
+
+                terraform init \
+                  -backend-config "bucket=${STATE_BUCKET}" \
+                  -backend-config "key=${TF_STATE_KEY}/serviceTwo/${ENV_NAME}.tfstate" \
+                  -backend-config "region=${REGION}"
+
+                terraform apply -auto-approve -var-file="$SETTINGS/settings.json"
+                terraform output -json > $SETTINGS/infrastructure.json
+
+
+      # Install dependencies, run unit tests, create webpack bundle, build
+      - task: build-lambda
         params:
           ENV: ((environment))
-          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
-          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
         config:
           platform: linux
           inputs:
             - name: source
             - name: settings
-            - name: tfoutput
+          outputs:
+            - name: source
+            - name: build
           image_resource:
             type: docker-image
             source:
@@ -183,7 +302,79 @@ jobs:
             dir: source/serviceTwo/lambda
             path: sh
             args:
-              - deploy_lambda.sh
+              - -ec
+              - |
+                # Directories created by concourse for passing input/output between tasks
+                WORKSPACE=../../..
+                SETTINGS=$WORKSPACE/settings
+                BUILD=$WORKSPACE/build
+
+                # Install dependencies
+                npm install
+
+                # Bundle source and dependencies
+                npx webpack
+
+                # Build config file for lambda
+                jq -s '.[0] * .[1]' $SETTINGS/settings.json $SETTINGS/infrastructure.json > ./dist/config.json
+
+                # hash the code to use as zip bundle filename
+                hash=($(md5sum dist/index.js))
+
+                # Build zip bundle for uploading to lambda
+                zip -jr $BUILD/${hash}.zip dist
+
+
+      - task: test-lambda
+        params:
+          ENV: ((environment))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            dir: source/serviceTwo/lambda
+            path: npm
+            args:
+              - test
+
+      - task: deploy-lambda
+        params:
+          ENV: ((environment))
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: settings
+            - name: build
+          image_resource:
+            type: docker-image
+            source:
+              repository: 005901988046.dkr.ecr.us-east-2.amazonaws.com/concourse-worker
+              tag: latest
+              aws_access_key_id: ((aws_access_key_id))
+              aws_secret_access_key: ((aws_secret_access_key))
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                FUNCTION_NAME=`jq -r .lambda_function.value settings/infrastructure.json`
+                REGION=`jq -r .region settings/settings.json`
+                ZIPFILE=`basename build/*.zip`
+                export AWS_PAGER=""
+
+                aws lambda update-function-code --region $REGION --function-name $FUNCTION_NAME --zip-file fileb://build/$ZIPFILE
+
 
       - task: functional-tests
         params:
@@ -195,7 +386,6 @@ jobs:
           inputs:
             - name: source
             - name: settings
-            - name: tfoutput
           image_resource:
             type: docker-image
             source:
@@ -208,4 +398,6 @@ jobs:
             path: sh
             args:
               - -exc
-              - npm install; npm test
+              - |
+                npm install
+                npm test
