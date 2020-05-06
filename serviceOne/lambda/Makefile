@@ -16,25 +16,25 @@ default: build test deploy
 
 build: $(BUILD)/serviceOneLambda.zip
 
-$(BUILD)/serviceOneLambda.zip:
-# Install dependencies and package lambda code
+
+node_modules: package.json
 	npm install
-	npx webpack
 
-# Add settings and infrastructure to config
-	jq -s '.[0] * .[1]' $(SETTINGS)/settings.json $(SETTINGS)/infrastructure.json > ./dist/config.json
 
-# Reset build dir if not running in pipeline
+$(BUILD)/serviceOneLambda.zip: node_modules $(wildcard src/*)
 ifneq ($(PIPELINE),1)
 	rm -rf $(BUILD)
 	mkdir -p $(BUILD)
 endif
 
-# Zip up code
+	npx webpack
+	jq -s '.[0] * .[1]' $(SETTINGS)/settings.json $(SETTINGS)/infrastructure.json > ./dist/config.json
 	zip -jr $(BUILD)/serviceOneLambda.zip dist
+
 
 test:
 	npm test
+
 
 deploy: $(BUILD)/serviceOneLambda.zip
 	AWS_PAGER="" aws lambda update-function-code --region $(REGION) --function-name $(FUNCTION_NAME) --zip-file fileb://$<

@@ -19,7 +19,7 @@ settings: check_env
 	${JQ_COMBINE} project-settings.json config/$$ENV.json > settings/settings.json
 
 serviceOne: settings
-	make -C serviceOne infrastructure
+	make -C serviceOne
 
 serviceTwo: settings
 	make -C serviceTwo
