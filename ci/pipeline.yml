@@ -29,11 +29,10 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            path: sh
             dir: source
+            path: make
             args:
-              - -exc
-              - jq -s '.[0] * .[1]' project-settings.json config/$ENV.json > ../settings/settings.json
+              - settings
 
       - task: deploy-infrastructure
         params:
@@ -56,30 +55,7 @@ jobs:
               aws_secret_access_key: ((aws_secret_access_key))
           run:
             dir: source/serviceOne/infrastructure
-            path: sh
-            args:
-              - -ec
-              - |
-                # Top level where source and input/output are mounted
-                WORKSPACE=../../..
-                SETTINGS=$WORKSPACE/settings
-
-                SETTINGS_FILE=$SETTINGS/settings.json
-                TFOUTPUT_FILE=$SETTINGS/infrastructure.json
-
-                ENV_NAME=`jq -r .environment $SETTINGS_FILE`
-                STATE_BUCKET=`jq -r .stateBucket $SETTINGS_FILE`
-                TF_STATE_KEY=`jq -r .tfStateKey $SETTINGS_FILE`
-                REGION=`jq -r .region $SETTINGS_FILE`
-
-                terraform init \
-                  -backend-config "bucket=${STATE_BUCKET}" \
-                  -backend-config "key=${TF_STATE_KEY}/serviceOne/${ENV_NAME}.tfstate" \
-                  -backend-config "region=${REGION}"
-
-                terraform apply -auto-approve -var-file="$SETTINGS/settings.json"
-                terraform output -json > $SETTINGS/infrastructure.json
-
+            path: make
 
       # Install dependencies, run unit tests, create webpack bundle, build
       - task: build-lambda
@@ -102,30 +78,9 @@ jobs:
               aws_secret_access_key: ((aws_secret_access_key))
           run:
             dir: source/serviceOne/lambda
-            path: sh
+            path: make
             args:
-              - -ec
-              - |
-                # Directories created by concourse for passing input/output between tasks
-                WORKSPACE=../../..
-                SETTINGS=$WORKSPACE/settings
-                BUILD=$WORKSPACE/build
-
-                # Install dependencies
-                npm install
-
-                # Bundle source and dependencies
-                npx webpack
-
-                # Build config file for lambda
-                jq -s '.[0] * .[1]' $SETTINGS/settings.json $SETTINGS/infrastructure.json > ./dist/config.json
-
-                # hash the code to use as zip bundle filename
-                hash=($(md5sum dist/index.js))
-
-                # Build zip bundle for uploading to lambda
-                zip -jr $BUILD/${hash}.zip dist
-
+              - build
 
       - task: test-lambda
         params:
@@ -144,7 +99,7 @@ jobs:
               aws_secret_access_key: ((aws_secret_access_key))
           run:
             dir: source/serviceOne/lambda
-            path: npm
+            path: make
             args:
               - test
 
@@ -166,17 +121,10 @@ jobs:
               aws_access_key_id: ((aws_access_key_id))
               aws_secret_access_key: ((aws_secret_access_key))
           run:
-            path: sh
+            dir: source/serviceOne/lambda
+            path: make
             args:
-              - -exc
-              - |
-                FUNCTION_NAME=`jq -r .lambda_function.value settings/infrastructure.json`
-                REGION=`jq -r .region settings/settings.json`
-                ZIPFILE=`basename build/*.zip`
-                export AWS_PAGER=""
-
-                aws lambda update-function-code --region $REGION --function-name $FUNCTION_NAME --zip-file fileb://build/$ZIPFILE
-
+              - deploy
 
       - task: functional-tests
         params:
