@@ -2,8 +2,8 @@ export ENV=greg
 export AWS_PROFILE=candid-developers
 
 # TODO: Get these dynamically
-export AWS_ACCESS_KEY_ID=AKIAQCX6JGDHLOOXGTHB
-export AWS_SECRET_ACCESS_KEY=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
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
 
 # Looks up the directory tree for a specific file to find the $PROJECT_ROOT.
 # Then sets $RELATIVE_DIR to the current relative directory inside the $PROJECT_ROOT.
