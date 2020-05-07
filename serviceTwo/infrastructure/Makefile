@@ -17,12 +17,12 @@ TF_STATE_KEY=`jq -r .tfStateKey $(SETTINGS_FILE)`
 REGION=`jq -r .region $(SETTINGS_FILE)`
 
 deploy:
-	terraform init -backend-config "bucket=${STATE_BUCKET}" -backend-config "key=${TF_STATE_KEY}/serviceOne/${ENV_NAME}.tfstate" -backend-config "region=${REGION}"
+	terraform init -backend-config "bucket=${STATE_BUCKET}" -backend-config "key=${TF_STATE_KEY}/serviceTwo/${ENV_NAME}.tfstate" -backend-config "region=${REGION}"
 	terraform plan -var-file="$(SETTINGS_FILE)"
 	terraform apply -auto-approve -var-file="$(SETTINGS_FILE)"
 	terraform output -json > $(TFOUTPUT_FILE)
 	cat $(TFOUTPUT_FILE)
 
 destroy:
-	terraform init -backend-config "bucket=${STATE_BUCKET}" -backend-config "key=${TF_STATE_KEY}/serviceOne/${ENV_NAME}.tfstate" -backend-config "region=${REGION}"
+	terraform init -backend-config "bucket=${STATE_BUCKET}" -backend-config "key=${TF_STATE_KEY}/serviceTwo/${ENV_NAME}.tfstate" -backend-config "region=${REGION}"
 	terraform destroy -var-file="$(SETTINGS_FILE)"

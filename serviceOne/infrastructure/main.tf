@@ -1,8 +1,8 @@
 provider "aws" {
-  region = "${var.region}"
-  allowed_account_ids = "${var.allowedAccountIds}"
+  region = var.region
+  allowed_account_ids = var.allowedAccountIds
   assume_role {
-    role_arn     = "${var.roleArn}"
+    role_arn     = var.roleArn
     session_name = "${var.environment}-infrastructure-deploy"
   }
 }
