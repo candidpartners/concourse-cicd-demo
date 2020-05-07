@@ -1,3 +1,4 @@
+.PHONY: deploy
 
 ifeq ($(PIPELINE),1)
   # Running in pipeline; settings dir is at the same level as project root
@@ -20,4 +21,4 @@ deploy:
 	terraform plan -var-file="$(SETTINGS_FILE)"
 	terraform apply -auto-approve -var-file="$(SETTINGS_FILE)"
 	terraform output -json > $(TFOUTPUT_FILE)
-
+	cat $(TFOUTPUT_FILE)

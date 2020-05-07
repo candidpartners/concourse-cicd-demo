@@ -27,6 +27,7 @@ endif
 settings: check_env
 	mkdir -p settings
 	${JQ_COMBINE} project-settings.json config/$$ENV.json > $(SETTINGS)/settings.json
+	cat $(SETTINGS)/settings.json
 
 serviceOne: settings
 	make -C serviceOne

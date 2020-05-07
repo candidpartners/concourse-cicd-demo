@@ -3,7 +3,6 @@ resources:
     type: git
     source:
       uri: https://github.com/candidpartners/concourse-cicd-demo.git
-      branch: noserverless
 
 jobs:
   - name: serviceOne
@@ -35,7 +34,7 @@ jobs:
             args:
               - settings
 
-      - task: deploy-infrastructure
+      - task: infrastructure-deploy
         params:
           ENV: ((environment))
           PIPELINE: 1
@@ -60,7 +59,7 @@ jobs:
             path: make
 
       # Install dependencies, run unit tests, create webpack bundle, build
-      - task: build-lambda
+      - task: lambda-build
         params:
           ENV: ((environment))
           PIPELINE: 1
@@ -85,7 +84,7 @@ jobs:
             args:
               - build
 
-      - task: test-lambda
+      - task: lambda-test
         params:
           ENV: ((environment))
           PIPELINE: 1
@@ -107,7 +106,7 @@ jobs:
             args:
               - test
 
-      - task: deploy-lambda
+      - task: lambda-deploy
         params:
           ENV: ((environment))
           PIPELINE: 1

@@ -1,3 +1,5 @@
+.PHONY: default build test deploy
+
 ifeq ($(PIPELINE),1)
 # Running in pipeline; settings/build dir is at the same level as project root
 SETTINGS=../../../settings
