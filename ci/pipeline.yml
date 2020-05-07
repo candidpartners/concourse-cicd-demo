@@ -117,6 +117,7 @@ jobs:
           inputs:
             - name: settings
             - name: build
+            - name: source
           image_resource:
             type: docker-image
             source:
