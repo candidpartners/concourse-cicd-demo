@@ -31,7 +31,7 @@ endif
 
 	npx webpack
 	jq -s '.[0] * .[1]' $(SETTINGS)/settings.json $(SETTINGS)/infrastructure.json > ./dist/config.json
-	7za a $(BUILD)/serviceOneLambda.zip dist/*
+	7za a -tzip $(BUILD)/serviceOneLambda.zip ./dist/*
 
 
 test:
@@ -40,3 +40,6 @@ test:
 
 deploy: $(BUILD)/serviceOneLambda.zip
 	AWS_PAGER="" aws lambda update-function-code --region $(REGION) --function-name $(FUNCTION_NAME) --zip-file fileb://$<
+
+clean:
+	rm -rf build node_modules
