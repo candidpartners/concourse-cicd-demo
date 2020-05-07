@@ -15,6 +15,7 @@ jobs:
       - task: settings
         params:
           ENV: ((environment))
+          PIPELINE: 1
         config:
           platform: linux
           inputs:
@@ -37,6 +38,7 @@ jobs:
       - task: deploy-infrastructure
         params:
           ENV: ((environment))
+          PIPELINE: 1
           AWS_ACCESS_KEY_ID: ((aws_access_key_id))
           AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
         config:
@@ -61,6 +63,7 @@ jobs:
       - task: build-lambda
         params:
           ENV: ((environment))
+          PIPELINE: 1
         config:
           platform: linux
           inputs:
@@ -85,6 +88,7 @@ jobs:
       - task: test-lambda
         params:
           ENV: ((environment))
+          PIPELINE: 1
         config:
           platform: linux
           inputs:
@@ -106,6 +110,7 @@ jobs:
       - task: deploy-lambda
         params:
           ENV: ((environment))
+          PIPELINE: 1
           AWS_ACCESS_KEY_ID: ((aws_access_key_id))
           AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
         config:
@@ -129,6 +134,7 @@ jobs:
       - task: functional-tests
         params:
           ENV: ((environment))
+          PIPELINE: 1
           AWS_ACCESS_KEY_ID: ((aws_access_key_id))
           AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
         config:
