@@ -31,7 +31,7 @@ endif
 
 	npx webpack
 	jq -s '.[0] * .[1]' $(SETTINGS)/settings.json $(SETTINGS)/infrastructure.json > ./dist/config.json
-	zip -jr $(BUILD)/serviceOneLambda.zip dist
+	7za a $(BUILD)/serviceOneLambda.zip dist/*
 
 
 test:
