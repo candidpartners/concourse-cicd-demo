@@ -1,0 +1,1 @@
+Deploys mock SQS, transaction ingestion lambdas and a dynamo global table in primary and secondary regions.

@@ -1,5 +1,7 @@
 {
+  "projectPrefix": "fbt-tax",
   "region": "us-east-2",
+  "drRegion": "us-east-1",
   "stateBucket": "concourse-pipeline-demo",
   "tfStateKey": "tfstate",
   "serverlessStateKey": "serverless",
