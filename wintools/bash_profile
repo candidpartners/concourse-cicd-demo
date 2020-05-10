@@ -1,0 +1,5 @@
+# Environment name for AWS resources
+export ENV=greg
+
+# AWS profile name in ~/aws/config and ~/aws/credentials
+export AWS_PROFILE=candid-developers
