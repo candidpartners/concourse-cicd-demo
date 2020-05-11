@@ -16,7 +16,6 @@ const DYNAMO_TABLE = {
   EVENTS: globalInfra.events_dynamo_table.value,
 }
 
-let s3
 let docClient
 let sqsPrimary
 let sqsSecondary
@@ -31,7 +30,7 @@ function sleep(ms) {
 
 async function postToMockIngestQueue(sqs, infra, execution) {
   const {
-    mockTransactionIngest_sqs_queue_url: { value: QueueUrl },
+    mockTransactionIngest2_sqs_queue_url: { value: QueueUrl },
   } = infra
   const params = {
     QueueUrl,
@@ -54,11 +53,10 @@ function sample(arrayOfValues) {
   return arrayOfValues[(Math.random() * arrayOfValues.length) | 0]
 }
 
-describe('Event Builder', () => {
+describe('Event Builder PoC 2', () => {
   beforeAll(async () => {
     const params = await utils.getSTSCredentials()
 
-    s3 = new AWS.S3(params)
     docClient = new AWS.DynamoDB.DocumentClient(params)
     sqsPrimary = new AWS.SQS({ ...params, region: settings.primaryRegion })
     sqsSecondary = new AWS.SQS({ ...params, region: settings.secondaryRegion })
@@ -127,7 +125,7 @@ describe('Event Builder', () => {
     await updateActiveRegion(ssmSecondary, secondaryInfra, settings.secondaryRegion)
     await updateActiveRegion(ssmPrimary, primaryInfra, settings.secondaryRegion)
 
-    // waitForExpect dynamodb to have 300 messages summed up properly
+    // waitForExpect dynamodb to have 300 transactions summed up properly
     await waitForExpect(
       async () => {
         // expect each batch to be summed up properly by comparing the batch quantity

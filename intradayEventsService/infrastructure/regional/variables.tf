@@ -38,3 +38,7 @@ variable "stateBucket" {
 variable "serverlessStateKey" {
   type = string
 }
+
+variable "logRetentionInDays" {
+  type = number
+}

@@ -73,25 +73,6 @@ async function handler(event) {
       `,
   }
 
-  // const params = {
-  //   TableName: DYNAMO_TABLE.EVENTS,
-  //   Key: {
-  //     id: `${tran.account}_${tran.cusip}`,
-  //     sort: `${tran.date}_${tran.orderNum}_${tran.price}`,
-  //   },
-  //   ExpressionAttributeNames: {
-  //     '#transactions': 'transactions',
-  //     '#tranId': tran.tranId,
-  //     // '#quantity': 'quantity',
-  //   },
-  //   ExpressionAttributeValues: {
-  //     ':transaction': tran,
-  //     // ':emptyMap': {},
-  //     // ':quantity': tran.quantity,
-  //   },
-  //   UpdateExpression: 'SET #transactions.#tranId = :transaction',
-  // }
-
   const startTime = process.hrtime()
 
   await docClient.update(params).promise()

@@ -1,3 +1,3 @@
 const build = require('./webpack.template')
 
-module.exports = build('eventsBuilder')
+module.exports = build('eventBuilder1')
