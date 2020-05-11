@@ -27,7 +27,7 @@ jobs:
               repository: jednaszewski/concourse-worker
               tag: latest
           run:
-            dir: source
+            dir: source/kinesisToDynamo
             path: make
             args:
               - settings
@@ -51,7 +51,7 @@ jobs:
               repository: jednaszewski/concourse-worker
               tag: latest
           run:
-            dir: source/serviceOne/infrastructure
+            dir: source/kinesisToDynamo/infrastructure
             path: make
 
       - task: lambda-test
@@ -69,7 +69,7 @@ jobs:
               repository: jednaszewski/concourse-worker
               tag: latest
           run:
-            dir: source/serviceOne/lambda
+            dir: source/kinesisToDynamo/lambda
             path: make
             args:
               - test
@@ -92,7 +92,7 @@ jobs:
               repository: jednaszewski/concourse-worker
               tag: latest
           run:
-            dir: source/serviceOne/lambda
+            dir: source/kinesisToDynamo/lambda
             path: make
             args:
               - build
@@ -115,7 +115,7 @@ jobs:
               repository: jednaszewski/concourse-worker
               tag: latest
           run:
-            dir: source/serviceOne/lambda
+            dir: source/kinesisToDynamo/lambda
             path: make
             args:
               - deploy
@@ -137,7 +137,7 @@ jobs:
               repository: jednaszewski/concourse-worker
               tag: latest
           run:
-            dir: source/serviceOne/functional_tests
+            dir: source/kinesisToDynamo/functional_tests
             path: make
             args:
               - test
