@@ -2,7 +2,11 @@ variable "region" {
   type = string
 }
 
-variable "drRegion" {
+variable "otherRegion" {
+  type = string
+}
+
+variable "primaryRegion" {
   type = string
 }
 

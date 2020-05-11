@@ -1,9 +1,8 @@
 resource "aws_dynamodb_table" "events" {
-  # provider       = aws.dr # us-east-1
-  name           = "${local.resourcePrefix}-events"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "id"
-  range_key      = "sort"
+  name         = "${local.resourcePrefix}-events"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
+  range_key    = "sort"
 
   attribute {
     name = "id"
@@ -38,11 +37,11 @@ output "events_dynamo_table" {
 }
 
 resource "aws_dynamodb_table" "events_dr" {
-  provider       = aws.dr
-  name           = "${local.resourcePrefix}-events"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "id"
-  range_key      = "sort"
+  provider     = aws.secondary
+  name         = "${local.resourcePrefix}-events"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "id"
+  range_key    = "sort"
 
   attribute {
     name = "id"
@@ -76,10 +75,10 @@ resource "aws_dynamodb_global_table" "myTable" {
   name = "${local.resourcePrefix}-events"
 
   replica {
-    region_name = var.region
+    region_name = var.primaryRegion
   }
 
   replica {
-    region_name = var.drRegion
+    region_name = var.secondaryRegion
   }
 }

@@ -1,5 +1,5 @@
 provider "aws" {
-  region = var.region
+  region              = var.region
   allowed_account_ids = var.allowedAccountIds
   assume_role {
     role_arn     = var.roleArn
@@ -8,8 +8,8 @@ provider "aws" {
 }
 
 provider "aws" {
-  alias = "dr"
-  region = var.drRegion
+  alias               = "other"
+  region              = var.otherRegion
   allowed_account_ids = var.allowedAccountIds
   assume_role {
     role_arn     = var.roleArn

@@ -1,0 +1,19 @@
+{
+  "name": "intradayEventsService-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.658.0",
+    "wait-for-expect": "^3.0.2"
+  },
+  "devDependencies": {
+    "jest": "^25.4.0",
+    "uuid": "^7.0.3"
+  }
+}
