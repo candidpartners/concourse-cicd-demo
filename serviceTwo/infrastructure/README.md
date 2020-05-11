@@ -1,1 +1,0 @@
-Deploys a Kinesis data stream with a single shard and a dynamo table.
