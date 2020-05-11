@@ -61,7 +61,7 @@ describe('Event Builder PoC 1', () => {
       quantity: 10,
     }
     const tran2 = {
-      ranId: uuid(),
+      tranId: uuid(),
       account,
       cusip,
       date,
