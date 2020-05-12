@@ -1,8 +1,8 @@
-.PHONY: default build test deploy
+.PHONY: default node_modules build test deploy
 
 default: test build deploy
 
-node_modules:
+node_modules: package.json
 	npm install
 
 test: node_modules

@@ -68,9 +68,7 @@ resource "aws_iam_policy" "lambda_s3_dynamo_sqs"{
     },
     {
       "Action": [
-        "sqs:ReceiveMessage",
-        "sqs:DeleteMessage",
-        "sqs:GetQueueAttributes"
+        "sqs:*"
       ],
       "Effect": "Allow",
       "Resource": "*"

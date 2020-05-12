@@ -1,4 +1,4 @@
-var path = require('path')
+const path = require('path')
 
 module.exports = (name) => {
   const filename = `${name}.js`
@@ -10,7 +10,7 @@ module.exports = (name) => {
     output: {
       libraryTarget: 'commonjs2',
       filename: 'index.js',
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, 'dist', name),
     },
   }
 }

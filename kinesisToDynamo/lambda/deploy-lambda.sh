@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ve
+set -e
 
 lambda=$1
 dist=$2
@@ -29,4 +29,5 @@ zipPath=${BUILD}/$lambda.zip
 jq -s '.[0] * .[1]' ${SETTINGS}/settings.json ${SETTINGS}/infrastructure.json > ./dist/${lambda}/config.json
 7za a -tzip ${zipPath} ./dist/${lambda}/*
 
+echo "Deploying ${lambda}"
 AWS_PAGER="" aws lambda update-function-code --region $region --function-name $functionName --zip-file fileb://$zipPath

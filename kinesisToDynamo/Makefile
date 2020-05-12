@@ -34,10 +34,10 @@ settings:
 infrastructure: settings
 	make -C infrastructure
 
-lambda: infrastructure
+lambda: settings
 	make -C lambda
 
-functional_tests: lambda
+functional_tests: settings
 	make -C functional_tests
 
 destroy:

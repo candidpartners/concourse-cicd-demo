@@ -3,21 +3,21 @@ resource "aws_dynamodb_table" "position" {
   billing_mode   = "PROVISIONED"
   read_capacity  = 100
   write_capacity = 100
-  hash_key       = "Id"
-  range_key      = "Sort"
+  hash_key       = "id"
+  range_key      = "timestamp"
 
   attribute {
-    name = "Id"
+    name = "id"
     type = "S"
   }
 
   attribute {
-    name = "Sort"
-    type = "S"
+    name = "timestamp"
+    type = "N"
   }
 
   tags = {
-    Name        = "transaction-table"
+    Name        = "position-table"
     Environment = "${var.environment}"
   }
 

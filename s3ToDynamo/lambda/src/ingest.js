@@ -11,7 +11,8 @@ function transformLine(line) {
   const fields = line.split(',')
   return {
     id: fields[0],
-    type: fields[1],
+    timestamp: Date.now(),
+    recordType: fields[1],
     values: fields.slice(2),
   }
 }
@@ -19,19 +20,18 @@ function transformLine(line) {
 async function sendToQueue(record) {
   const params = {
     MessageBody: JSON.stringify(record),
-    QueueUrl: config.writeLambdaQueue,
+    QueueUrl: config.write_lambda_queue.value,
   }
-
   await sqs.sendMessage(params).promise()
 }
 
 async function processFile(record) {
-  return new Promise((resolve, reject) => {
-    const params = {
-      Bucket: record.s3.bucket.name,
-      Key: record.s3.object.key,
-    }
+  const params = {
+    Bucket: record.s3.bucket.name,
+    Key: record.s3.object.key,
+  }
 
+  await new Promise((resolve, reject) => {
     const readStream = s3.getObject(params).createReadStream()
     const rl = readline.createInterface({ input: readStream })
 
@@ -47,6 +47,9 @@ async function processFile(record) {
     rl.on('error', reject)
     readStream.on('error', reject)
   })
+
+  // Remove the file from S3
+  await s3.deleteObject(params).promise()
 }
 
 async function handler(event) {
