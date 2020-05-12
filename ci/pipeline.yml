@@ -141,3 +141,140 @@ jobs:
             path: make
             args:
               - test
+
+  - name: s3ToDynamo
+    serial: true
+    plan:
+      - get: source
+        trigger: true
+
+      - task: settings
+        params:
+          ENV: ((environment))
+          PIPELINE: 1
+        config:
+          platform: linux
+          inputs:
+            - name: source
+          outputs:
+            - name: settings
+          image_resource:
+            type: docker-image
+            source:
+              repository: jednaszewski/concourse-worker
+              tag: latest
+          run:
+            dir: source/s3ToDynamo
+            path: make
+            args:
+              - settings
+
+      - task: infrastructure-deploy
+        params:
+          ENV: ((environment))
+          PIPELINE: 1
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          outputs:
+            - name: settings
+          image_resource:
+            type: docker-image
+            source:
+              repository: jednaszewski/concourse-worker
+              tag: latest
+          run:
+            dir: source/s3ToDynamo/infrastructure
+            path: make
+
+      - task: lambda-test
+        params:
+          ENV: ((environment))
+          PIPELINE: 1
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          image_resource:
+            type: docker-image
+            source:
+              repository: jednaszewski/concourse-worker
+              tag: latest
+          run:
+            dir: source/s3ToDynamo/lambda
+            path: make
+            args:
+              - test
+
+      - task: lambda-build
+        params:
+          ENV: ((environment))
+          PIPELINE: 1
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          outputs:
+            - name: source
+            - name: build
+          image_resource:
+            type: docker-image
+            source:
+              repository: jednaszewski/concourse-worker
+              tag: latest
+          run:
+            dir: source/s3ToDynamo/lambda
+            path: make
+            args:
+              - build
+
+      - task: lambda-deploy
+        params:
+          ENV: ((environment))
+          PIPELINE: 1
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: settings
+            - name: build
+            - name: source
+          image_resource:
+            type: docker-image
+            source:
+              repository: jednaszewski/concourse-worker
+              tag: latest
+          run:
+            dir: source/s3ToDynamo/lambda
+            path: make
+            args:
+              - deploy
+
+      - task: functional-tests
+        params:
+          ENV: ((environment))
+          PIPELINE: 1
+          AWS_ACCESS_KEY_ID: ((aws_access_key_id))
+          AWS_SECRET_ACCESS_KEY: ((aws_secret_access_key))
+        config:
+          platform: linux
+          inputs:
+            - name: source
+            - name: settings
+          image_resource:
+            type: docker-image
+            source:
+              repository: jednaszewski/concourse-worker
+              tag: latest
+          run:
+            dir: source/s3ToDynamo/functional_tests
+            path: make
+            args:
+              - test
