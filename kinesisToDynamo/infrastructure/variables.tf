@@ -26,11 +26,6 @@ variable "stateBucket" {
   type = string
 }
 
-# Not used by terraform, but added here to remove warning
-variable "serverlessStateKey" {
-  type = string
-}
-
 locals {
   prefix = "${var.environment}-${var.serviceName}"
 }
