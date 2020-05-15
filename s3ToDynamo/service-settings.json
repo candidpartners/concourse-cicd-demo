@@ -1,3 +1,4 @@
 {
-  "serviceName": "s3-to-dynamo"
+  "serviceName": "s3-to-dynamo",
+  "kmsKey": "alias/gaj-test"
 }

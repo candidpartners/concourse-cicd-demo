@@ -27,6 +27,10 @@ variable "stateBucket" {
   type = string
 }
 
+variable "kmsKey" {
+  type = string
+}
+
 locals {
   prefix = "${var.environment}-${var.serviceName}"
 }

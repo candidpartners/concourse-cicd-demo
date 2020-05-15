@@ -1,5 +1,8 @@
 resource "aws_sqs_queue" "writeLambda" {
   name = "${local.prefix}-writeLambda"
+
+  kms_master_key_id                 = var.kmsKey
+  kms_data_key_reuse_period_seconds = 300
 }
 
 resource "aws_lambda_function" "write" {
