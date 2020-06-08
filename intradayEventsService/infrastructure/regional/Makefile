@@ -17,22 +17,26 @@ SECONDARY_REGION=`jq -r .secondaryRegion $(SETTINGS_FILE)`
 
 # TODO: better way of handling state switch between primary/secondary, rather than removing state?
 
-deploy-primary:
+plan-primary:
 	rm -rf .terraform/*.tfstate
 	terraform init -backend-config "bucket=${STATE_BUCKET}" -backend-config "key=${TF_STATE_KEY}/intradayEventsService/primary/${ENV_NAME}.tfstate" -backend-config "region=${PRIMARY_REGION}"
 	terraform plan -var-file="$(SETTINGS_FILE)" \
 		-var "region=${PRIMARY_REGION}" \
 		-var "otherRegion=${SECONDARY_REGION}" \
 		-var "primaryRegion=${PRIMARY_REGION}"
+
+deploy-primary: plan-primary
 	terraform apply -auto-approve -var-file="$(SETTINGS_FILE)" -var "region=${PRIMARY_REGION}" -var "otherRegion=${SECONDARY_REGION}"
 	terraform output -json > primary_output.json
 
-deploy-secondary:
+plan-secondary:
 	rm -rf .terraform/*.tfstate
 	terraform init -backend-config "bucket=${STATE_BUCKET}" -backend-config "key=${TF_STATE_KEY}/intradayEventsService/secondary/${ENV_NAME}.tfstate" -backend-config "region=${PRIMARY_REGION}"
 	terraform plan -var-file="$(SETTINGS_FILE)" \
 		-var "region=${SECONDARY_REGION}" \
 		-var "otherRegion=${PRIMARY_REGION}" \
 		-var "primaryRegion=${PRIMARY_REGION}"
+
+deploy-secondary: plan-secondary
 	terraform apply -auto-approve -var-file="$(SETTINGS_FILE)" -var "region=${SECONDARY_REGION}" -var "otherRegion=${PRIMARY_REGION}"
 	terraform output -json > secondary_output.json

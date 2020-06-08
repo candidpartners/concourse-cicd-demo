@@ -13,7 +13,7 @@ const {
 jest.setTimeout(600000)
 
 const DYNAMO_TABLE = {
-  EVENTS: globalInfra.events_dynamo_table.value,
+  TRANSACTIONS: globalInfra.transactions_dynamo_table.value,
 }
 
 let docClient
@@ -44,7 +44,7 @@ describe('Event Builder PoC 1', () => {
     AWS.config.credentials = null
   })
 
-  it('order executions in different regions are rolled up to the same event', async function () {
+  it('transactions in different regions are rolled up by order number and price', async function () {
     const account = uuid() // unique to this test run
     const cusip = '02079K107'
     const date = new Date().toISOString().split('T')[0]
@@ -52,7 +52,7 @@ describe('Event Builder PoC 1', () => {
     const price = 500
 
     const tran1 = {
-      tranId: uuid(),
+      id: uuid(),
       account,
       cusip,
       date,
@@ -61,7 +61,7 @@ describe('Event Builder PoC 1', () => {
       quantity: 10,
     }
     const tran2 = {
-      tranId: uuid(),
+      id: uuid(),
       account,
       cusip,
       date,
@@ -80,7 +80,7 @@ describe('Event Builder PoC 1', () => {
     await waitForExpect(
       async () => {
         const params = {
-          TableName: DYNAMO_TABLE.EVENTS,
+          TableName: DYNAMO_TABLE.TRANSACTIONS,
           ExpressionAttributeNames: {
             '#id': 'id',
             '#sort': 'sort',

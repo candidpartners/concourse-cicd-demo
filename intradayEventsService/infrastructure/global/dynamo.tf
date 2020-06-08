@@ -1,5 +1,5 @@
-resource "aws_dynamodb_table" "events" {
-  name         = "${local.resourcePrefix}-events"
+resource "aws_dynamodb_table" "transactions" {
+  name         = "${local.resourcePrefix}-transactions"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
   range_key    = "sort"
@@ -15,7 +15,7 @@ resource "aws_dynamodb_table" "events" {
   }
 
   tags = {
-    Name        = "${local.resourcePrefix}-events"
+    Name        = "${local.resourcePrefix}-transactions"
     Environment = "${var.environment}"
   }
 
@@ -32,13 +32,13 @@ resource "aws_dynamodb_table" "events" {
   # }
 }
 
-output "events_dynamo_table" {
-  value = aws_dynamodb_table.events.name
+output "transactions_dynamo_table" {
+  value = aws_dynamodb_table.transactions.name
 }
 
-resource "aws_dynamodb_table" "events_dr" {
+resource "aws_dynamodb_table" "transactions_dr" {
   provider     = aws.secondary
-  name         = "${local.resourcePrefix}-events"
+  name         = "${local.resourcePrefix}-transactions"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "id"
   range_key    = "sort"
@@ -54,7 +54,7 @@ resource "aws_dynamodb_table" "events_dr" {
   }
 
   tags = {
-    Name        = "${local.resourcePrefix}-events"
+    Name        = "${local.resourcePrefix}-transactions"
     Environment = "${var.environment}"
   }
 
@@ -68,11 +68,11 @@ resource "aws_dynamodb_table" "events_dr" {
 
 resource "aws_dynamodb_global_table" "myTable" {
   depends_on = [
-    aws_dynamodb_table.events,
-    aws_dynamodb_table.events_dr
+    aws_dynamodb_table.transactions,
+    aws_dynamodb_table.transactions_dr
   ]
 
-  name = "${local.resourcePrefix}-events"
+  name = "${local.resourcePrefix}-transactions"
 
   replica {
     region_name = var.primaryRegion

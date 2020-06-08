@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>WebSocket Test</title>
+<script language="javascript" type="text/javascript">
+  const wsUri = 'ws://localhost:3000?clientId=display'
+  let output
+
+  function init() {
+    output = document.getElementById('output')
+    connectWebSocket()
+  }
+
+  function connectWebSocket() {
+    websocket = new WebSocket(wsUri)
+    websocket.onopen = function (evt) {
+      onOpen(evt)
+    }
+    websocket.onclose = function (evt) {
+      onClose(evt)
+    }
+    websocket.onmessage = function (evt) {
+      onMessage(evt)
+    }
+    websocket.onerror = function (evt) {
+      onError(evt)
+    }
+  }
+
+  function onOpen(evt) {
+    writeToScreen('CONNECTED')
+  }
+
+  function onClose(evt) {
+    writeToScreen('DISCONNECTED')
+  }
+
+  function onMessage(evt) {
+    const data = JSON.parse(evt.data)
+    if (data.type === 'send' || data.type === 'receiveEvent' || data.type === 'receiveTransaction')
+      updateRegionCount(data)
+    if (data.type === 'activeRegion')
+      updateActiveRegion(data)
+    if (data.type === 'scenario')
+      updateScenario(data)
+  }
+
+  function onError(evt) {
+    writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data)
+  }
+
+  function writeToScreen(message) {
+    var pre = document.createElement('p');
+    pre.style.wordWrap = 'break-word';
+    pre.innerHTML = message;
+    output.appendChild(pre);
+  }
+
+  function updateRegionCount(data) {
+    const elem = document.getElementById(`${data.type}-${data.region}`);
+    elem.textContent = data.count;
+  }
+
+  function updateActiveRegion(data) {
+    const elem = document.getElementById(`${data.type}`);
+    elem.textContent = data.region;
+    document.getElementById(`send-us-east-2-container`).setAttribute('data-enabled', false);
+    document.getElementById(`send-us-east-1-container`).setAttribute('data-enabled', false);
+    document.getElementById(`send-${data.region}-container`).setAttribute('data-enabled', true)
+  }
+
+  function updateScenario(data) {
+    const elem = document.getElementById('scenario');
+    elem.textContent = data.label;
+  }
+
+  window.addEventListener('load', init, false)
+</script>
+<style type="text/css">
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  div[data-enabled] {
+    background: none;
+    text-align: right;
+  }
+  div[data-enabled="true"] {
+    background: lightgreen;
+  }
+  .label {
+    width: 300px;
+    font-size: 24px;
+  }
+  h1, h2, h3 {
+    margin: 0;
+  }
+  .header {
+    width: 950px;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+  }
+  #scenario {
+    width: 250px;
+  }
+</style>
+
+<body>
+  <div class="header">
+    <div>
+      <h1>Multi-region roll-up demo</h1>
+    </div>
+    <div>
+      <h3>Active region</h3>
+      <span id="activeRegion"></span>
+    </div>
+    <div>
+      <h3>Scenario</h3>
+      <div id="scenario"></div>
+    </div>
+  </div>
+
+  <div style="position: absolute; width:360px; height:488px; left:243px; top:182px; border: 1px dashed red;"></div>
+
+  <div style="width: 1300px; height: 700px">
+    <div style="position: absolute; background: url('arch.png') no-repeat; width: 1300px; height: 700px; opacity: 0.3;"></div>
+    <div id="send-us-east-2-container" data-enabled="false" class="label" style="position: relative; left: 60px; top: 260px;">
+      us-east-2
+      <div id="send-us-east-2">0</div>
+    </div>
+    <div id="send-us-east-1-container" data-enabled="false" class="label" style="position: relative; left: 60px; top: 340px;">
+      us-east-1
+      <div id="send-us-east-1">0</div>
+    </div>
+    
+    <div class="label" style="position: relative; left: 450px; top: 25px;">
+      us-east-2
+      <div>
+        <span id="receiveTransaction-us-east-2">0</span>
+        rolled into
+        <span id="receiveEvent-us-east-2">0</span> items
+      </div>
+    </div>
+    <div class="label" style="position: relative; left: 450px; top: 265px;">
+      us-east-1
+      <div>
+        <span id="receiveTransaction-us-east-1">0</span>
+        rolled into
+        <span id="receiveEvent-us-east-1">0</span> items
+      </div>
+    </div>
+  </div>
+  <div id="output"></div>
+</body>
+</html>

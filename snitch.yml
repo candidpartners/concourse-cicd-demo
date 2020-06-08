@@ -1,0 +1,12 @@
+rules:
+  - aws-iam-custom-policies-have-controlled-scope:
+      actionSets:
+        - blacklistedActions:
+            - 'iam:CreateUser'
+          policyExceptions: []
+  - aws-iam-no-passrole-star-policies: {}
+  - aws-iam-no-policies-allow-cloudtrail-stop: {}
+  - aws-iam-policies-are-least-privileged: {}
+  - aws-iam-trust-policy-only-allows-one-service: {}
+  - aws-s3-bucket-versioning: {}
+  - aws-dynamodb-encryption: {}

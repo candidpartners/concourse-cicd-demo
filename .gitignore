@@ -1,2 +1,3 @@
 settings/
 *params*.yml
+.DS_Store

@@ -8,7 +8,7 @@ const config = require('./config.json')
 const { AWS_REGION: currentRegion } = process.env
 
 const DYNAMO_TABLE = {
-  EVENTS: config.global.events_dynamo_table.value,
+  TRANSACTIONS: config.global.transactions_dynamo_table.value,
 }
 
 const docClient = new AWS.DynamoDB.DocumentClient()
@@ -24,7 +24,7 @@ async function handler(event) {
   Primary Key: accountId_CUSIP
   Sort Key: CURRENT_DATE_orderNum_price | CURRENT_DATE_uuid
   {
-    tranId: <uuid>,
+    id: <uuid>,
     account: 1234,
     cusip: <ibm cusip>,
     date: <isodate>,
@@ -50,7 +50,7 @@ async function handler(event) {
   */
 
   const params = {
-    TableName: DYNAMO_TABLE.EVENTS,
+    TableName: DYNAMO_TABLE.TRANSACTIONS,
     Key: {
       id: `${tran.account}_${tran.cusip}`,
       sort: `${tran.date}_BUYSELL_${tran.orderNum}_${tran.price}`,
@@ -72,6 +72,7 @@ async function handler(event) {
       ADD #quantity :quantity
       `,
   }
+  console.log(`Rolling up into Event key: ${JSON.stringify(params.Key)}`)
 
   const startTime = process.hrtime()
 
