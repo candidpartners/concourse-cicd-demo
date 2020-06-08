@@ -60,8 +60,10 @@ async function ensureActiveRegion(message) {
     })
     console.log(`Send to other SQS completed`)
 
-    return
+    return false
   }
+
+  return true
 }
 
 async function handler(event) {
@@ -70,13 +72,18 @@ async function handler(event) {
   const bodyString = event.Records[0].body
   const tran = JSON.parse(bodyString)
 
-  tran.receiveTime = new Date().toISOString()
-  tran.receiveRegion = currentRegion
+  if (!tran.receiveTime) {
+    tran.receiveTime = new Date().toISOString()
+    tran.receiveRegion = currentRegion
+  }
 
   // If active region is different from current region, enqueue in other region and exit
-  if (!ensureActiveRegion(tran)) {
+  if (!(await ensureActiveRegion(tran))) {
+    console.log('SHOULD BE EXITING')
     return
   }
+
+  tran.writeRegion = currentRegion
 
   // Otherwise perform the roll-up in DynamoDB
 
